@@ -9,9 +9,12 @@ var session = require('express-session');
 var routes = require('./routes/index');
 // var users = require('./routes/users');
 var register = require('./routes/register');
+var entries = require('./routes/entries');
 var messages = require('./lib/messages');
 var login = require('./routes/login');
 var user = require('./lib/middleware/user');
+var page = require('./lib/middleware/page');
+var Entry = require('./lib/entry');
 
 var app = express();
 
@@ -36,13 +39,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(user);
 app.use(messages);
 
-app.use('/', routes);
 // app.use('/users', users);
 app.get('/register', register.form);
 app.post('/register', register.submit);
 app.get('/login', login.form);
 app.post('/login', login.submit);
 app.get('/logout', login.logout);
+app.get('/post', entries.form);
+app.post('/post', entries.submit);
+app.use('/:page?', page(Entry.count, 5), entries.list);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
