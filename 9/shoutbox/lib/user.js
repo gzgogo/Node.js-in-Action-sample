@@ -1,6 +1,5 @@
 var redis = require('redis');
 var crypto = require('crypto');
-var sha1 = crypto.createHash('sha1');
 var db = redis.createClient();
 
 module.exports = User;
@@ -51,7 +50,9 @@ User.prototype.hashPassword = function (fn) {
   user.salt = crypto.randomBytes(16).toString('hex');
   // console.log('salt: ' + user.salt);
 
+  var sha1 = crypto.createHash('sha1');
   sha1.update(user.pass).update(user.salt);
+
   user.pass = sha1.digest('hex');
   fn();
 }
@@ -87,7 +88,9 @@ User.authenticate = function (name, pass, fn) {
       return fn();
     }
 
+    var sha1 = crypto.createHash('sha1');
     sha1.update(pass).update(user.salt);
+
     var hash = sha1.digest('hex');
     if (hash === user.pass) {
       return fn(null, user);
@@ -95,7 +98,14 @@ User.authenticate = function (name, pass, fn) {
 
     fn(); //密码无效
   })
-}
+};
+
+User.prototype.toJSON = function () {
+  return {
+    id: this.id,
+    name: this.name
+  }
+};
 
 
 // var tobi = new User({
