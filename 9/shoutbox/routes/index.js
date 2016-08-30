@@ -1,4 +1,5 @@
 exports.notfound = function (req, res) {
+  console.log('notfound');
   res.status(404).format({
     html: function () {
       res.render('404');
@@ -18,6 +19,8 @@ exports.notfound = function (req, res) {
 };
 
 exports.error = function (err, req, res, next) {
+  console.log('error');
+
   console.error(err.stack);
   var msg;
 

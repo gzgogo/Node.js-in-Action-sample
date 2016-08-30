@@ -41,7 +41,6 @@ app.use('/api', api.auth);
 app.use(user);
 app.use(messages);
 
-// app.use('/users', users);
 app.get('/register', register.form);
 app.post('/register', register.submit);
 app.get('/login', login.form);
@@ -49,16 +48,15 @@ app.post('/login', login.submit);
 app.get('/logout', login.logout);
 app.get('/post', entries.form);
 app.post('/post', entries.submit);
-
 app.get('/api/user/:id', api.user);
 app.post('/api/entry', entries.submit);
 app.get('/api/entries/:page?', page(Entry.count), api.entries);
+app.get('/:page?', page(Entry.count, 5), entries.list);
 
-app.use('/:page?', page(Entry.count, 5), entries.list);
+console.log(process.env.NODE_ENV);
+if (process.env.NODE_ENV === 'ERROR_ROUTE') {
+  console.log('enter /dev/error');
 
-app.use(routes.notfound);
-
-if (process.env.ERROR_ROUTE) {
   app.get('/dev/error', function (req, res, next) {
     var err = new Error('database connection failed');
     err.type = 'database';
@@ -66,6 +64,7 @@ if (process.env.ERROR_ROUTE) {
   })
 };
 
+app.use(routes.notfound);
 app.use(routes.error);
 
 // catch 404 and forward to error handler
